@@ -1,0 +1,14 @@
+# ---- Build output ----
+/build/
+/out/
+/bin/
+/lib/
+
+# ---- CMake ----
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+compile_commands.json
+CTestTestfile.cmake
+cm
