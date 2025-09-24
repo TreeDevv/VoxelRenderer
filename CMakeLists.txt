@@ -12,7 +12,7 @@ find_package(imgui CONFIG REQUIRED)               # target: imgui::imgui
 find_package(spdlog CONFIG REQUIRED)              # target: spdlog::spdlog_header_only
 
 # App
-file(GLOB SRC CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.cpp)
 add_executable(${PROJECT_NAME} ${SRC})
 
 target_link_libraries(${PROJECT_NAME}
@@ -27,6 +27,6 @@ target_link_libraries(${PROJECT_NAME}
 # Copy runtime assets (shaders, textures) next to the binary
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/shaders
-          $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+          ${CMAKE_SOURCE_DIR}/assets/shaders
+          $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/shaders
 )
