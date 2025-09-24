@@ -1,10 +1,13 @@
 #include "Application.h"
 #include "EngineConfig.h"
 #include "Clock.h"
+#include "../Platform/IWindow.h"
 #include "../Platform/GLFWWindow.h"
+#include "../Graphics/GLRenderer.h"
 
 using namespace GameCore;
 using namespace GamePlatform;
+using namespace GameGraphics;
 
 namespace GameCore
 {
@@ -52,6 +55,9 @@ namespace GameCore
         window.setCloseCallback([&]()
                                 { requestQuit(); });
 
+        GLRenderer renderer(window);
+        renderer.initialize();
+
         while (_running && !window.shouldClose())
         {
             _clock->tick();
@@ -60,6 +66,9 @@ namespace GameCore
             update();
 
             // Renderer calls.
+            renderer.beginFrame();
+            renderer.draw();
+            renderer.endFrame();
 
             window.swapBuffers();
         }

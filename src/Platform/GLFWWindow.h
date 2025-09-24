@@ -7,7 +7,7 @@
 namespace GamePlatform
 {
 
-    class GLFWWindow : IWindow
+    class GLFWWindow : public IWindow
     {
     public:
         GLFWWindow();

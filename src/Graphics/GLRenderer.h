@@ -1,15 +1,14 @@
 #pragma once
 
 #include "IRenderer.h"
+#include "../Platform/IWindow.h"
 
 namespace GameGraphics
 {
-    class IWindow;
-
-    class GLRenderer : IRenderer
+    class GLRenderer : public IRenderer
     {
     public:
-        explicit GLRenderer(IWindow &win) : _win(win) {}
+        explicit GLRenderer(GamePlatform::IWindow &win) : _win(win) {}
         bool initialize() override;
         void resize(int w, int h) override;
         void beginFrame() override;
@@ -17,6 +16,6 @@ namespace GameGraphics
         void endFrame() override;
 
     private:
-        IWindow &_win;
+        GamePlatform::IWindow &_win;
     };
 }
