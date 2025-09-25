@@ -1,7 +1,11 @@
 #pragma once
 
+#include <memory>
+#include "Camera.h"
+
 namespace GameGraphics
 {
+
     class IRenderer
     {
     public:
@@ -10,6 +14,7 @@ namespace GameGraphics
         virtual bool initialize() = 0;
         virtual void resize(int w, int h) = 0;
         virtual void beginFrame() = 0;
+        virtual void setCamera(std::shared_ptr<Camera> camera) = 0;
         virtual void draw() = 0; // Eventually pass scene to draw function
         virtual void endFrame() = 0;
 

@@ -17,6 +17,10 @@ void GameGraphics::GLRenderer::beginFrame()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void GameGraphics::GLRenderer::setCamera(Camera &camera)
+{
+}
+
 void GameGraphics::GLRenderer::draw()
 {
 }
