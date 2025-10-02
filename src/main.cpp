@@ -1,3 +1,5 @@
+#define GLFW_INCLUDE_NONE // prevent glfw including opengl headers. Glad takes care of this
+
 #include "Core/Application.h"
 
 #include <iostream>

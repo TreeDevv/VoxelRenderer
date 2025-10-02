@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IWindow.h"
-#define GLFW_INCLUDE_NONE // prevent glfw including opengl headers. Glad takes care of this
+
 #include <GLFW/glfw3.h>
 
 namespace GamePlatform

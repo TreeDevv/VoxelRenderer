@@ -2,8 +2,12 @@
 
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
-#include <glm.hpp>
-#include "Chunk.h"
+#include <glm/common.hpp>
+
+#include "../GL/VertexArray.h"
+#include "../GL/VertexBuffer.h"
+
+#include "../World/Chunk.h"
 
 using namespace GameWorld;
 
@@ -18,12 +22,12 @@ namespace GameGraphics
 
     enum class Face : uint8_t
     {
-        PX,
-        NX,
-        PY,
-        NY,
-        PZ,
-        NZ
+        PX = 0,
+        NX = 1,
+        PY = 2,
+        NY = 3,
+        PZ = 4,
+        NZ = 5,
     }; // +X -X +Y -Y +Z -Z
 
     static const glm::ivec3 kFaceNormalI[6] = {
@@ -41,13 +45,13 @@ namespace GameGraphics
         ChunkMesher(Chunk &chunk);
 
         void generateFaces();
-        void draw();
+        
+        VertexArray getVAO() const { return _vao; }
 
-    private:
+        private:
         Chunk &_chunk;
-
-        unsigned int _vbo;
-        unsigned int _ibo;
-        size_t _indicesSize;
+        
+        VertexArray _vao;
+        VertexBuffer _vbo;
     };
 }
