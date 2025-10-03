@@ -28,5 +28,7 @@ void VertexBuffer::Unbind()
 void VertexBuffer::VertexAttribute(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer)
 {   
     // Last arg is first appearence offset
+    this->Bind();
     glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+    glEnableVertexAttribArray(index);
 }

@@ -1,7 +1,5 @@
 #include "ChunkMesher.h"
 
-#include <glad/glad.h>
-
 GameGraphics::ChunkMesher::ChunkMesher(Chunk &chunk)
     : _chunk(chunk) // initialize member variable(s) here
 {

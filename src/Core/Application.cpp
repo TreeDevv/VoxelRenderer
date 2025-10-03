@@ -1,12 +1,15 @@
+#include <glad/glad.h>
+
 #include "Application.h"
 #include "EngineConfig.h"
 #include "Clock.h"
 #include "../Platform/IWindow.h"
 #include "../Platform/GLFWWindow.h"
+#include "../Graphics/CubeRenderer.h"
 
 using namespace GameCore;
 using namespace GamePlatform;
-
+using namespace GameGraphics;
 
 namespace GameCore
 {
@@ -54,7 +57,12 @@ namespace GameCore
         window.setCloseCallback([&]()
                                 { requestQuit(); });
 
-        
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            return 1;
+        }
+
+        CubeRenderer _testRenderer;
 
         while (_running && !window.shouldClose())
         {
@@ -64,7 +72,12 @@ namespace GameCore
             update();
 
             // Renderer calls.
-           
+            glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+            // Clear both color and depth each frame to avoid stale depth values
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // Render test cube at origin so it's inside clip space for the simple shader
+            _testRenderer.renderCube(glm::vec3(0.0f));
 
             window.swapBuffers();
         }

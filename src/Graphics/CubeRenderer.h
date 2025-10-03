@@ -2,6 +2,7 @@
 
 #include "../GL/VertexArray.h"
 #include "../GL/VertexBuffer.h"
+#include "../GL/ShaderProgram.h"
 
 #include <glm/glm.hpp>
 
@@ -19,6 +20,8 @@ namespace GameGraphics
 
             void renderCube(const glm::vec3 &position);
         private:
+
+            ShaderProgram _defaultProgram;
 
             VertexArray _vao;
             VertexBuffer _vbo;
