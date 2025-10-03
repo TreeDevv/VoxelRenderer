@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <vector>
+#include <map>
 
 #include <glfw/glfw3.h>
 
@@ -115,13 +116,18 @@ namespace GamePlatform
     public:
         Input(void *handle);
 
+        static bool isKeyDown(Key key);
+
         void onKeyPressed(KeyCallback cb);
         void onKeyReleased(KeyCallback cb);
 
     private:
         static void _key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-        inline static std::vector<KeyCallback> _pressedCbs{};
+        inline static std::map<Key, bool> _pressedKeys{};
+
+        inline static std::vector<KeyCallback>
+            _pressedCbs{};
         inline static std::vector<KeyCallback> _releasedCbs{};
     };
 }

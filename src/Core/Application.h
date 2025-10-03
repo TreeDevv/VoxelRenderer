@@ -24,7 +24,7 @@ namespace GameCore
     private:
         bool init(int argc, char **argv);
         void shutdown();
-        void update(); // Per frame update. No rendering
+        void update(Camera &camera); // Per frame update. No rendering
 
         bool _running = true;
 

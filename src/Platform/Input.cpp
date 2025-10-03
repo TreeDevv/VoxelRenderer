@@ -11,6 +11,8 @@ void Input::_key_callback(GLFWwindow *window, int key, int scancode, int action,
         {
             cb(platformKey);
         }
+
+        _pressedKeys[platformKey] = true;
     }
     else if (action == GLFW_RELEASE)
     {
@@ -18,12 +20,24 @@ void Input::_key_callback(GLFWwindow *window, int key, int scancode, int action,
         {
             cb(platformKey);
         }
+
+        _pressedKeys[platformKey] = false;
     }
 }
 
 GamePlatform::Input::Input(void *handle)
 {
     glfwSetKeyCallback((GLFWwindow *)handle, _key_callback);
+}
+
+bool GamePlatform::Input::isKeyDown(Key key)
+{
+    if (_pressedKeys.contains(key) && _pressedKeys.at(key) == true)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void GamePlatform::Input::onKeyPressed(KeyCallback cb)

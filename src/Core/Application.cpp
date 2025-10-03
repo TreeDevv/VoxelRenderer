@@ -9,6 +9,7 @@
 #include "../Platform/GLFWWindow.h"
 #include "../Platform/Input.h"
 #include "../Graphics/CubeRenderer.h"
+#include "../Graphics/Camera.hpp"
 
 using namespace GameCore;
 using namespace GamePlatform;
@@ -37,9 +38,19 @@ namespace GameCore
     {
     }
 
-    void Application::update()
+    void Application::update(Camera &camera)
     {
         // Timers, Events, Input polling
+
+        // Camera movement
+        if (Input::isKeyDown(Key::W))
+            camera.ProcessKeyboard(Camera_Movement::FORWARD, _clock->deltaSeconds());
+        else if (Input::isKeyDown(Key::S))
+            camera.ProcessKeyboard(Camera_Movement::BACKWARD, _clock->deltaSeconds());
+        if (Input::isKeyDown(Key::A))
+            camera.ProcessKeyboard(Camera_Movement::LEFT, _clock->deltaSeconds());
+        else if (Input::isKeyDown(Key::D))
+            camera.ProcessKeyboard(Camera_Movement::RIGHT, _clock->deltaSeconds());
     }
 
     int Application::run(int argc, char **argv)
@@ -67,6 +78,8 @@ namespace GameCore
 
         Input input(window.nativeHandle());
 
+        Camera camera;
+
         CubeRenderer _testRenderer;
 
         while (_running && !window.shouldClose())
@@ -74,7 +87,7 @@ namespace GameCore
             _clock->tick();
             window.pollEvents();
 
-            update();
+            update(camera);
 
             // Renderer calls.
             glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
