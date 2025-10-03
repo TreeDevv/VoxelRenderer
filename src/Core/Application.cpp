@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <glad/glad.h>
 
 #include "Application.h"
@@ -5,6 +7,7 @@
 #include "Clock.h"
 #include "../Platform/IWindow.h"
 #include "../Platform/GLFWWindow.h"
+#include "../Platform/Input.h"
 #include "../Graphics/CubeRenderer.h"
 
 using namespace GameCore;
@@ -61,6 +64,8 @@ namespace GameCore
         {
             return 1;
         }
+
+        Input input(window.nativeHandle());
 
         CubeRenderer _testRenderer;
 
