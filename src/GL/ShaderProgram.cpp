@@ -1,9 +1,5 @@
 #include "ShaderProgram.h"
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 
 using namespace std;
 
@@ -78,6 +74,14 @@ void ShaderProgram::setVec3(const char* name, float x, float y, float z)
     if (loc == -1) return;
     glUseProgram(_program);
     glUniform3f(loc, x, y, z);
+}
+
+void ShaderProgram::setMat4(const char *name, const glm::mat4 &mat)
+{
+    use();
+    GLint loc = glGetUniformLocation(_program, name);
+    if (loc == -1) return;
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 string ShaderProgram::_getShaderCode(const char *path)

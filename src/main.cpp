@@ -3,6 +3,7 @@
 #include "Core/Application.h"
 
 #include <iostream>
+#include <exception>
 
 using namespace GameCore;
 
@@ -10,5 +11,12 @@ int main(int argc, char **argv)
 {
     Application app;
     std::cout << "Application Running" << std::endl;
-    return app.run(argc, argv);
+    try {
+        app.run(argc, argv);
+    } catch(std::exception e)
+    {
+        std::cout << e.what();
+    }
+    
+    return 1;
 }

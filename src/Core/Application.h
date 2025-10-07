@@ -1,6 +1,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "Services.h"
+#include <memory>
+
 namespace GameCore
 {
 
@@ -24,7 +27,7 @@ namespace GameCore
     private:
         bool init(int argc, char **argv);
         void shutdown();
-        void update(Camera &camera); // Per frame update. No rendering
+        void update(std::shared_ptr<Services> services); // Per frame update. No rendering
 
         bool _running = true;
 

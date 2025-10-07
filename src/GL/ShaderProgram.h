@@ -1,7 +1,13 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 using namespace std;
 
@@ -12,7 +18,9 @@ public:
     ~ShaderProgram();
 
     void use();
+    
     void setVec3(const char* name, float x, float y, float z);
+    void setMat4(const char* name, const glm::mat4 &mat);
 private:
     string _getShaderCode(const char* path);
 
