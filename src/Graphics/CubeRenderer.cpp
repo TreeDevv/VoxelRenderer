@@ -57,7 +57,7 @@ GameGraphics::CubeRenderer::CubeRenderer() : _defaultProgram("assets/shaders/Bas
     
     _vbo.Bind();
     _vbo.BufferData(sizeof(vertices), vertices, GL_STATIC_DRAW);
-    _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
     _vbo.Unbind();
     _vao.Unbind();
@@ -76,7 +76,7 @@ void GameGraphics::CubeRenderer::renderCube(std::shared_ptr<Camera> camera, cons
     _defaultProgram.setMat4("u_View", camera->GetViewMatrix());
     _defaultProgram.setMat4("u_Projection", camera->GetPerspectiveMatrix());
 
-    // _vao.Bind();
-    // glDrawArrays(GL_TRIANGLES, 0, 36);
-    // _vao.Unbind();
+    _vao.Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    _vao.Unbind();
 }

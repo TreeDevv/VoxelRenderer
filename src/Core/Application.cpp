@@ -12,6 +12,7 @@
 #include "../Graphics/CubeRenderer.h"
 #include "../Graphics/Camera.hpp"
 #include "../Graphics/ChunkMesh.h"
+#include "../GL/ShaderProgram.h"
 
 #include "../World/Chunk.h"
 
@@ -137,6 +138,7 @@ namespace GameCore
         ChunkMesh mesh(chunk);
         mesh.constructMesh();
 
+        ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
 
         while (_running && !window->shouldClose())
         {
@@ -151,14 +153,19 @@ namespace GameCore
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Render test cube at origin so it's inside clip space for the simple shader
-            //    for (float x = 0; x < 100; x += 1.1)
-            //    {
-            //     for (float y = 0; y < 100; y += 1.1)
-            //     {
-            //         _testRenderer->renderCube(camera, glm::vec3(x, ((x / 10) + (y / 10)), y));
-            //     }
-            //    }
+               for (float x = 0; x < 100; x += 1.1)
+               {
+                for (float y = 0; y < 100; y += 1.1)
+                {
+                    _testRenderer->renderCube(camera, glm::vec3(20, 0, 0) + glm::vec3(x, ((x / 10) + (y / 10)), y));
+                }
+               }
             _testRenderer->renderCube(camera, glm::vec3(0.0f));
+
+            shader.use();
+            shader.setMat4("u_View", camera->GetViewMatrix());
+            shader.setMat4("u_Model", glm::mat4(1));
+            shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
 
             mesh.getVAO().Bind();
             (glDrawElements(GL_TRIANGLES, floor(mesh.getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
