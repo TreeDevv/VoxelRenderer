@@ -8,6 +8,7 @@
 #include <glm/vec2.hpp>
 #include <glm/common.hpp>
 
+#include "../GL/IndexBuffer.hpp"
 #include "../GL/VertexArray.h"
 #include "../GL/VertexBuffer.h"
 
@@ -88,6 +89,7 @@ namespace GameGraphics
         void constructMesh();
         
         VertexArray getVAO() const { return _vao; }
+        unsigned int getVerticeCount() const { return _verticesCount; } 
 
         private:
 
@@ -97,6 +99,7 @@ namespace GameGraphics
         VertexBuffer _vbo;
         
         std::vector<Vertex> m_Vertices;
+        unsigned int _verticesCount;
 
         void _addFace(glm::vec3 position, Face face);
     };

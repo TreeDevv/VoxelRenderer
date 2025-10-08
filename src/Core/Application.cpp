@@ -11,6 +11,9 @@
 #include "../Platform/Input.h"
 #include "../Graphics/CubeRenderer.h"
 #include "../Graphics/Camera.hpp"
+#include "../Graphics/ChunkMesh.h"
+
+#include "../World/Chunk.h"
 
 using namespace GameCore;
 using namespace GamePlatform;
@@ -111,10 +114,29 @@ namespace GameCore
 
             camera->ProcessMouseMovement(xOffset, yOffset);
         });
-
-
+    
+        // Test cube renderer
         std::shared_ptr<CubeRenderer> _testRenderer = std::make_shared<CubeRenderer>();
         services->set<CubeRenderer>(_testRenderer);
+
+        // Create a chunk to test meshing
+        std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>();
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 128; y++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    if (x > 1 && x < 15 && z > 1 && z < 15 && y > 1 && y < 127)
+                    {
+                        chunk->set(x, y, z, GameWorld::BlockID::DIRT);
+                    }
+                }
+            }
+        }
+        ChunkMesh mesh(chunk);
+        mesh.constructMesh();
+
 
         while (_running && !window->shouldClose())
         {
@@ -129,13 +151,18 @@ namespace GameCore
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Render test cube at origin so it's inside clip space for the simple shader
-           for (float x = 0; x < 100; x += 1.1)
-           {
-            for (float y = 0; y < 100; y += 1.1)
-            {
-                _testRenderer->renderCube(camera, glm::vec3(x, ((x / 10) + (y / 10)), y));
-            }
-           }
+            //    for (float x = 0; x < 100; x += 1.1)
+            //    {
+            //     for (float y = 0; y < 100; y += 1.1)
+            //     {
+            //         _testRenderer->renderCube(camera, glm::vec3(x, ((x / 10) + (y / 10)), y));
+            //     }
+            //    }
+            _testRenderer->renderCube(camera, glm::vec3(0.0f));
+
+            mesh.getVAO().Bind();
+            (glDrawElements(GL_TRIANGLES, floor(mesh.getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
+            mesh.getVAO().Unbind();
 
             window->swapBuffers();
         }

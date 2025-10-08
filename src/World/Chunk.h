@@ -14,7 +14,7 @@ namespace GameWorld
 
         Chunk()
         {
-            _voxels.resize(WIDTH * HEIGHT * LENGTH, BlockID::GRASS);
+            _voxels.resize(WIDTH * HEIGHT * LENGTH, BlockID::AIR);
         }
 
         std::vector<BlockID> get() const

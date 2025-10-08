@@ -1,14 +1,46 @@
 #include "ChunkMesh.h"
 
+#include <iostream>
+
 GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     : _chunk(chunk) // initialize member variable(s) here
 {
+    static bool IndexBufferInitialized = false;
+    static IndexBuffer StaticIBO;
+    if (!IndexBufferInitialized)
+    {
+        GLuint* IndexBuffer = nullptr;
+
+        int indexSize = chunk->WIDTH * chunk->HEIGHT * chunk->WIDTH * 6; 
+        int indexOffset = 0;
+
+        IndexBuffer = new GLuint[indexSize * 6];
+
+        for (size_t i = 0; i < indexSize; i += 6)
+        {
+            IndexBuffer[i]     = 0 + indexOffset;
+            IndexBuffer[i + 1] = 1 + indexOffset;
+            IndexBuffer[i + 2] = 2 + indexOffset;
+            IndexBuffer[i + 3] = 2 + indexOffset;
+            IndexBuffer[i + 4] = 3 + indexOffset;
+            IndexBuffer[i + 5] = 0 + indexOffset;
+
+            indexOffset = indexOffset + 4;
+        }
+
+        StaticIBO.BufferData(indexSize * 6 * sizeof(GLuint), IndexBuffer, GL_STATIC_DRAW);
+        delete[] IndexBuffer;
+
+        IndexBufferInitialized = true;
+    }
+
     _vao = VertexArray();
     _vbo = VertexBuffer();
-
-   _vao.Bind();
-   _vbo.Bind();
-   _vbo.VertexAttribute(0, 3, sizeof(Vertex), GL_FALSE, sizeof(glm::vec3), (void*)0);
+    
+    _vao.Bind();
+    _vbo.Bind();
+    StaticIBO.Bind();
+   _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
    _vao.Unbind();
 }
 
@@ -62,8 +94,16 @@ void GameGraphics::ChunkMesh::constructMesh()
         }
     }
 
-    _vbo.BufferData(m_Vertices.size() * sizeof(Vertex), &m_Vertices.front(), GL_STATIC_DRAW);
-    m_Vertices.clear();
+    if (m_Vertices.size() > 0)
+    {
+        _vbo.BufferData(m_Vertices.size() * sizeof(Vertex), &m_Vertices.front(), GL_STATIC_DRAW);
+        _verticesCount = m_Vertices.size();
+        m_Vertices.clear();
+    }
+    else
+    {
+        std::cout << "No vertices";
+    }
 }
 
 void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face)
