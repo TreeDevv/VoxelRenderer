@@ -68,10 +68,15 @@ GameGraphics::CubeRenderer::~CubeRenderer()
 {
 }
 
-void GameGraphics::CubeRenderer::renderCube(const glm::vec3 &position)
+void GameGraphics::CubeRenderer::renderCube(std::shared_ptr<Camera> camera, const glm::vec3 &position)
 {
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+
     _defaultProgram.use();
-    _defaultProgram.setVec3("offset", position.x, position.y, position.z);
+    _defaultProgram.setMat4("u_Model", model);
+    _defaultProgram.setMat4("u_View", camera->GetViewMatrix());
+    _defaultProgram.setMat4("u_Projection", camera->GetPerspectiveMatrix());
+
     _vao.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
     _vao.Unbind();

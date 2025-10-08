@@ -82,11 +82,36 @@ namespace GameCore
         }
         services->set<IWindow>(window);
 
+        std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+        services->set<Camera>(camera);
+
         std::shared_ptr<Input> input = std::make_shared<Input>(window->nativeHandle());
         services->set<Input>(input);
 
-        std::shared_ptr<Camera> camera = std::make_shared<Camera>();
-        services->set<Camera>(camera);
+        bool firstMouse = true;
+        float lastX;
+        float lastY;
+        input->mouseMove([&firstMouse, &lastX, &lastY, &camera](double xPos, double yPos)
+        {
+            float f_xPos = static_cast<float>(xPos);
+            float f_yPos = static_cast<float>(yPos);
+
+            if (firstMouse)
+            {
+                lastX = f_xPos;
+                lastY = f_yPos;
+                firstMouse = false;
+            }
+
+            float xOffset = f_xPos - lastX;
+            float yOffset = lastY - f_yPos;
+
+            lastY = f_yPos;
+            lastX = f_xPos;
+
+            camera->ProcessMouseMovement(xOffset, yOffset);
+        });
+
 
         std::shared_ptr<CubeRenderer> _testRenderer = std::make_shared<CubeRenderer>();
         services->set<CubeRenderer>(_testRenderer);
@@ -104,7 +129,13 @@ namespace GameCore
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Render test cube at origin so it's inside clip space for the simple shader
-            _testRenderer->renderCube(glm::vec3(0.0f));
+           for (float x = 0; x < 100; x += 1.1)
+           {
+            for (float y = 0; y < 100; y += 1.1)
+            {
+                _testRenderer->renderCube(camera, glm::vec3(x, ((x / 10) + (y / 10)), y));
+            }
+           }
 
             window->swapBuffers();
         }

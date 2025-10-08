@@ -110,6 +110,7 @@ namespace GamePlatform
     }
 
     using KeyCallback = std::function<void(Key)>;
+    using MouseCallback = std::function<void(double xPos, double yPos)>;
 
     class Input
     {
@@ -118,16 +119,21 @@ namespace GamePlatform
 
         static bool isKeyDown(Key key);
 
+        void mouseMove(MouseCallback cb);
+
         void onKeyPressed(KeyCallback cb);
         void onKeyReleased(KeyCallback cb);
 
     private:
         static void _key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+        static void _mouse_callback(GLFWwindow *window, double xPos, double yPos);
 
         inline static std::map<Key, bool> _pressedKeys{};
 
         inline static std::vector<KeyCallback>
             _pressedCbs{};
         inline static std::vector<KeyCallback> _releasedCbs{};
+
+        inline static std::vector<MouseCallback> _mouseMoveCbs{};
     };
 }

@@ -25,9 +25,18 @@ void Input::_key_callback(GLFWwindow *window, int key, int scancode, int action,
     }
 }
 
+void GamePlatform::Input::_mouse_callback(GLFWwindow *window, double xPos, double yPos)
+{
+    for (auto &cb : _mouseMoveCbs)
+    {
+        cb(xPos, yPos);
+    }
+}
+
 GamePlatform::Input::Input(void *handle)
 {
     glfwSetKeyCallback((GLFWwindow *)handle, _key_callback);
+    glfwSetCursorPosCallback((GLFWwindow *)handle, _mouse_callback);
 }
 
 bool GamePlatform::Input::isKeyDown(Key key)
@@ -38,6 +47,11 @@ bool GamePlatform::Input::isKeyDown(Key key)
     }
 
     return false;
+}
+
+void GamePlatform::Input::mouseMove(MouseCallback cb)
+{
+    _mouseMoveCbs.push_back(cb);
 }
 
 void GamePlatform::Input::onKeyPressed(KeyCallback cb)

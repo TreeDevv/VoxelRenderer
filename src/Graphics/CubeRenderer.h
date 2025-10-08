@@ -4,6 +4,9 @@
 #include "../GL/VertexBuffer.h"
 #include "../GL/ShaderProgram.h"
 
+#include "../Graphics/Camera.hpp"
+
+#include <memory>
 #include <glm/glm.hpp>
 
 /*
@@ -18,7 +21,7 @@ namespace GameGraphics
             CubeRenderer();
             ~CubeRenderer();
 
-            void renderCube(const glm::vec3 &position);
+            void renderCube(std::shared_ptr<Camera> camera, const glm::vec3 &position);
         private:
 
             ShaderProgram _defaultProgram;

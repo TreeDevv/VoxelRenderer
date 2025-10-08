@@ -40,6 +40,9 @@ bool GamePlatform::GLFWWindow::create(const WindowDesc &desc)
     glfwMakeContextCurrent(_win);
     glfwSwapInterval(desc.vsync ? 1 : 0);
 
+    // Lock mouse to window
+    glfwSetInputMode(_win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     // Load GL
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         return false;
@@ -48,7 +51,9 @@ bool GamePlatform::GLFWWindow::create(const WindowDesc &desc)
     glfwSetFramebufferSizeCallback(_win, [](GLFWwindow *w, int width, int height)
                                    { 
         auto *self = static_cast<GLFWWindow *>(s_thisFrom(w)); 
-        if (self->_onResize) self->_onResize(width, height); });
+        if (self->_onResize) self->_onResize(width, height); 
+        glViewport(0, 0, width, height);
+    });
     glfwSetWindowCloseCallback(_win, [](GLFWwindow *w)
                                { 
         auto *self = static_cast<GLFWWindow *>(s_thisFrom(w)); 

@@ -20,10 +20,17 @@ namespace GameGraphics
     const float SPEED = 2.5f;
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
+    const float SFOV = 90.0f;
+    const float SAspect = 1280.f / 720.f;
+    const float SZNear = 0.1f;
+    const float SZFar = 100.0f;
 
     // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
     class Camera
     {
+    private:
+    glm::mat4 perspectiveMatrix;
+
     public:
         // camera Attributes
         glm::vec3 Position;
@@ -39,6 +46,11 @@ namespace GameGraphics
         float MouseSensitivity;
         float Zoom;
 
+        float FOV;
+        float AspectRatio;
+        float ZNear;
+        float ZFar;
+
         // constructor with vectors
         Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
         {
@@ -46,7 +58,12 @@ namespace GameGraphics
             WorldUp = up;
             Yaw = yaw;
             Pitch = pitch;
+            this->FOV = SFOV;
+            this->AspectRatio = SAspect;
+            this->ZNear = SZNear;
+            this->ZFar = SZFar;
             updateCameraVectors();
+            calculatePerspective();
         }
         // constructor with scalar values
         Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -62,6 +79,20 @@ namespace GameGraphics
         glm::mat4 GetViewMatrix()
         {
             return glm::lookAt(Position, Position + Front, Up);
+        }
+
+        void UpdatePerspective(float FOV, float Aspect, float ZNear, float ZFar)
+        {
+            this->FOV = FOV;
+            this->AspectRatio = Aspect;
+            this->ZNear = ZNear;
+            this->ZFar = ZFar;
+            calculatePerspective();
+        }
+
+        glm::mat4 GetPerspectiveMatrix()
+        {
+            return perspectiveMatrix;
         }
 
         // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
@@ -111,6 +142,11 @@ namespace GameGraphics
         }
 
     private:
+        void calculatePerspective()
+        {
+            perspectiveMatrix = glm::perspective(FOV, AspectRatio, ZNear, ZFar);
+        }
+
         // calculates the front vector from the Camera's (updated) Euler Angles
         void updateCameraVectors()
         {
