@@ -17,13 +17,13 @@ namespace GameGraphics
     // Default camera values
     const float YAW = -90.0f;
     const float PITCH = 0.0f;
-    const float SPEED = 2.5f;
+    const float SPEED = 10.f;
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
     const float SFOV = 90.0f;
     const float SAspect = 1280.f / 720.f;
     const float SZNear = 0.1f;
-    const float SZFar = 100.0f;
+    const float SZFar = 1000.0f;
 
     // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
     class Camera

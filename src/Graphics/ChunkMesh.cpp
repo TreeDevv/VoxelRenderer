@@ -41,6 +41,7 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     _vbo.Bind();
     StaticIBO.Bind();
    _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
+   _vbo.VertexAttribute(1, 1, GL_INT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, ao));
    _vao.Unbind();
 }
 
@@ -66,6 +67,8 @@ void GameGraphics::ChunkMesh::constructMesh()
 
                 // TODO Index block id for now just check air 0
                 // Check all sides for blocks
+                if (_chunk->get(x, y, z) == 0)
+                    continue;
                 if (_chunk->get(x + 1, y, z) == 0) // Right face
                 {
                     _addFace(glm::vec3(x, y, z), Face::PX);
@@ -108,7 +111,7 @@ void GameGraphics::ChunkMesh::constructMesh()
 
 void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face)
 {
-    // Each face is 4 vertices 
+    // Each face is 4 vertices //TODO CALCULATE AO HERE
     Vertex v1, v2, v3, v4;
     v1.pos = position + kFaces[(int)face][0];
     v2.pos = position + kFaces[(int)face][1];

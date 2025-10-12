@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <glad/glad.h>
+#include <vector>
 
 #include "Application.h"
 #include "EngineConfig.h"
@@ -78,7 +79,7 @@ namespace GameCore
             return 1;
 
         window->setCloseCallback([&]()
-                                { requestQuit(); });
+                                 { requestQuit(); });
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -96,7 +97,7 @@ namespace GameCore
         float lastX;
         float lastY;
         input->mouseMove([&firstMouse, &lastX, &lastY, &camera](double xPos, double yPos)
-        {
+                         {
             float f_xPos = static_cast<float>(xPos);
             float f_yPos = static_cast<float>(yPos);
 
@@ -113,30 +114,39 @@ namespace GameCore
             lastY = f_yPos;
             lastX = f_xPos;
 
-            camera->ProcessMouseMovement(xOffset, yOffset);
-        });
-    
+            camera->ProcessMouseMovement(xOffset, yOffset); });
+
         // Test cube renderer
         std::shared_ptr<CubeRenderer> _testRenderer = std::make_shared<CubeRenderer>();
         services->set<CubeRenderer>(_testRenderer);
 
         // Create a chunk to test meshing
-        std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>();
-        for (int x = 0; x < 16; x++)
+        std::vector<std::shared_ptr<Chunk>> chunks = std::vector<std::shared_ptr<Chunk>>();
+        for (int i = 0; i < 64; i++)
         {
-            for (int y = 0; y < 128; y++)
+            for (int j = 0; j < 64; j++)
             {
-                for (int z = 0; z < 16; z++)
+                std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(glm::vec2(i, j));
+                chunks.push_back(chunk);
+                for (int x = 0; x < 16; x++)
                 {
-                    if (x > 1 && x < 15 && z > 1 && z < 15 && y > 1 && y < 127)
+                    for (int y = 0; y < 128; y++)
                     {
-                        chunk->set(x, y, z, GameWorld::BlockID::DIRT);
+                        for (int z = 0; z < 16; z++)
+                        {
+                            if (x > 1 && x < 15 && z > 1 && z < 15 && y > 1 && y < 127)
+                            {
+                                if (y < x)
+                                {
+                                    chunk->set(x, y, z, GameWorld::BlockID::DIRT);
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-        ChunkMesh mesh(chunk);
-        mesh.constructMesh();
+
 
         ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
 
@@ -146,30 +156,35 @@ namespace GameCore
             window->pollEvents();
 
             update(services);
-            
+
             // Renderer calls.
             glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
             // Clear both color and depth each frame to avoid stale depth values
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Render test cube at origin so it's inside clip space for the simple shader
-               for (float x = 0; x < 100; x += 1.1)
-               {
-                for (float y = 0; y < 100; y += 1.1)
-                {
-                    _testRenderer->renderCube(camera, glm::vec3(20, 0, 0) + glm::vec3(x, ((x / 10) + (y / 10)), y));
-                }
-               }
-            _testRenderer->renderCube(camera, glm::vec3(0.0f));
+            // for (float x = 0; x < 100; x += 1.1)
+            // {
+            //     for (float y = 0; y < 100; y += 1.1)
+            //     {
+            //         _testRenderer->renderCube(camera, glm::vec3(20, 0, 0) + glm::vec3(x, ((x / 10) + (y / 10)), y));
+            //     }
+            // }
+            // _testRenderer->renderCube(camera, glm::vec3(0.0f));
 
             shader.use();
             shader.setMat4("u_View", camera->GetViewMatrix());
-            shader.setMat4("u_Model", glm::mat4(1));
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
+            
+            for (auto chunk : chunks)
+            {
+                auto chunkPos = chunk->getPos();
+                shader.setMat4("u_Model", glm::translate(glm::mat4(1.0f), glm::vec3(chunkPos.x, 1, chunkPos.y)));
 
-            mesh.getVAO().Bind();
-            (glDrawElements(GL_TRIANGLES, floor(mesh.getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
-            mesh.getVAO().Unbind();
+                chunk->getMesh()->getVAO().Bind();
+                (glDrawElements(GL_TRIANGLES, floor(chunk->getMesh()->getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
+                chunk->getMesh()->getVAO().Unbind();
+            }
 
             window->swapBuffers();
         }

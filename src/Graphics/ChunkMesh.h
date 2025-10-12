@@ -21,6 +21,7 @@ namespace GameGraphics
     struct Vertex
     {
         glm::vec3 pos; // Location 0
+        int ao;
     };
 
     enum class Face : uint8_t

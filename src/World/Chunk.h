@@ -1,19 +1,28 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+#include <glm/glm.hpp>
 #include "Block/Block.h"
+
+// Forward declaration to avoid circular includes
+namespace GameGraphics
+{
+    class ChunkMesh;
+}
 
 namespace GameWorld
 {
-    class Chunk
+    class Chunk : public std::enable_shared_from_this<Chunk>
     {
     public:
         static constexpr int WIDTH = 16;
         static constexpr int HEIGHT = 256;
         static constexpr int LENGTH = 16;
 
-        Chunk()
+        Chunk(glm::vec2 pos)
         {
+            _pos = pos;
             _voxels.resize(WIDTH * HEIGHT * LENGTH, BlockID::AIR);
         }
 
@@ -25,6 +34,11 @@ namespace GameWorld
         BlockID get(int x, int y, int z) const
         {
             return _voxels[index(x, y, z)];
+        }
+
+        glm::vec2 getPos() const
+        {
+            return _pos * glm::vec2(WIDTH, LENGTH);
         }
 
         void set(int x, int y, int z, BlockID id)
@@ -40,9 +54,15 @@ namespace GameWorld
             _dirty = false;
         }
 
+        // Get the mesh for this chunk, generating it if dirty
+        std::shared_ptr<GameGraphics::ChunkMesh> getMesh();
+
     private:
+        glm::vec2 _pos;
+
         std::vector<BlockID> _voxels;
         bool _dirty = true;
+        std::shared_ptr<GameGraphics::ChunkMesh> _mesh;
 
         inline int
         index(int x, int y, int z) const
