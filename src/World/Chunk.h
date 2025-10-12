@@ -31,9 +31,19 @@ namespace GameWorld
             return _voxels;
         }
 
+        BlockID get(glm::vec3 pos) const
+        {
+            return get(pos.x, pos.y, pos.z);
+        }
+
         BlockID get(int x, int y, int z) const
         {
             return _voxels[index(x, y, z)];
+        }
+
+        bool isSolid(glm::vec3 pos) const 
+        {
+            return (get(pos) == BlockID::AIR);
         }
 
         glm::vec2 getPos() const

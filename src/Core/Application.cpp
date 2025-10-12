@@ -122,9 +122,9 @@ namespace GameCore
 
         // Create a chunk to test meshing
         std::vector<std::shared_ptr<Chunk>> chunks = std::vector<std::shared_ptr<Chunk>>();
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < 16; i++)
         {
-            for (int j = 0; j < 64; j++)
+            for (int j = 0; j < 16; j++)
             {
                 std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(glm::vec2(i, j));
                 chunks.push_back(chunk);
