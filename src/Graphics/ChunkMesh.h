@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <memory>
 
@@ -138,7 +139,6 @@ namespace GameGraphics
         unsigned int getVerticeCount() const { return _verticesCount; } 
 
         private:
-
         std::shared_ptr<Chunk> _chunk;
 
         VertexArray _vao;
