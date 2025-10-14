@@ -1,8 +1,11 @@
 #include "Chunk.h"
 #include "../Graphics/ChunkMesh.h"
 
+std::unordered_map<glm::vec2, std::shared_ptr<GameWorld::Chunk>> GameWorld::Chunk::GameChunks;
+
 namespace GameWorld
 {
+
     std::shared_ptr<GameGraphics::ChunkMesh> Chunk::getMesh()
     {
         // If mesh doesn't exist or chunk is dirty, create/regenerate the mesh

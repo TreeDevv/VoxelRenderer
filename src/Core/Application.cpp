@@ -134,19 +134,16 @@ namespace GameCore
                     {
                         for (int z = 0; z < 16; z++)
                         {
-                            if (x > 1 && x < 15 && z > 1 && z < 15 && y > 1 && y < 127)
+
+                            if (x > y * 2)
                             {
-                                if (y < x)
-                                {
-                                    chunk->set(x, y, z, GameWorld::BlockID::DIRT);
-                                }
+                                chunk->set(x, y, z, GameWorld::BlockID::DIRT);
                             }
                         }
                     }
                 }
             }
         }
-
 
         ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
 
@@ -175,7 +172,7 @@ namespace GameCore
             shader.use();
             shader.setMat4("u_View", camera->GetViewMatrix());
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
-            
+
             for (auto chunk : chunks)
             {
                 auto chunkPos = chunk->getPos();
