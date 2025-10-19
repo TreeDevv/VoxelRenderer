@@ -9,16 +9,16 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     static IndexBuffer StaticIBO;
     if (!IndexBufferInitialized)
     {
-        GLuint* IndexBuffer = nullptr;
+        GLuint *IndexBuffer = nullptr;
 
-        int indexSize = chunk->WIDTH * chunk->HEIGHT * chunk->WIDTH * 6; 
+        int indexSize = chunk->WIDTH * chunk->HEIGHT * chunk->WIDTH * 6;
         int indexOffset = 0;
 
         IndexBuffer = new GLuint[indexSize * 6];
 
         for (size_t i = 0; i < indexSize; i += 6)
         {
-            IndexBuffer[i]     = 0 + indexOffset;
+            IndexBuffer[i] = 0 + indexOffset;
             IndexBuffer[i + 1] = 1 + indexOffset;
             IndexBuffer[i + 2] = 2 + indexOffset;
             IndexBuffer[i + 3] = 2 + indexOffset;
@@ -36,12 +36,13 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
 
     _vao = VertexArray();
     _vbo = VertexBuffer();
-    
+
     _vao.Bind();
     _vbo.Bind();
     StaticIBO.Bind();
-   _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, pos));
-   _vao.Unbind();
+    _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, pos));
+    _vbo.VertexAttribute(1, 1, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void *)offsetof(Vertex, ao));
+    _vao.Unbind();
 }
 
 void GameGraphics::ChunkMesh::constructMesh()
@@ -58,14 +59,24 @@ void GameGraphics::ChunkMesh::constructMesh()
                     y == 0 ||
                     y >= _chunk->HEIGHT - 1 ||
                     z == 0 ||
-                    z >= _chunk->LENGTH - 1
-                ) // Edge of chunk condition. For now emit nothing to test
+                    z >= _chunk->LENGTH - 1) // Edge of chunk condition. For now emit all to test
                 {
-                    continue;
+                    if (_chunk->isSolid(glm::vec3(x, y, z)))
+                    {
+                        _addFace(glm::vec3(x, y, z), Face::PX);
+                        _addFace(glm::vec3(x, y, z), Face::NX);
+                        _addFace(glm::vec3(x, y, z), Face::PY);
+                        _addFace(glm::vec3(x, y, z), Face::NY);
+                        _addFace(glm::vec3(x, y, z), Face::PZ);
+                        _addFace(glm::vec3(x, y, z), Face::NZ);
+                        continue;
+                    }
                 }
 
                 // TODO Index block id for now just check air 0
                 // Check all sides for blocks
+                if (_chunk->get(x, y, z) == 0)
+                    continue;
                 if (_chunk->get(x + 1, y, z) == 0) // Right face
                 {
                     _addFace(glm::vec3(x, y, z), Face::PX);
@@ -108,15 +119,34 @@ void GameGraphics::ChunkMesh::constructMesh()
 
 void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face)
 {
-    // Each face is 4 vertices 
+    // Each face is 4 vertices //TODO CALCULATE AO HERE
     Vertex v1, v2, v3, v4;
     v1.pos = position + kFaces[(int)face][0];
+    v1.ao = _calculateAoValue(position, face, 0);
+
     v2.pos = position + kFaces[(int)face][1];
+    v2.ao = _calculateAoValue(position, face, 1);
+
     v3.pos = position + kFaces[(int)face][2];
+    v3.ao = _calculateAoValue(position, face, 2);
+
     v4.pos = position + kFaces[(int)face][3];
-    
+    v4.ao = _calculateAoValue(position, face, 3);
+
     m_Vertices.push_back(v1);
     m_Vertices.push_back(v2);
     m_Vertices.push_back(v3);
     m_Vertices.push_back(v4);
+}
+
+int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int vert)
+{
+    bool s1 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][0]);
+    bool s2 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][1]);
+    bool s3 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][2]);
+
+    if (s1 && s2)
+        return 3;
+    else
+        return (int)s1 + (int)s2 + (int)s3;
 }

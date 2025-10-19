@@ -1,10 +1,12 @@
 #version 330 core
 
+in float vAO;
 in vec3 randomColor;
 
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(normalize(randomColor), 1.0f);
+    float aoFactor = (1.0);
+    FragColor = vec4(normalize(randomColor) * aoFactor , 1.0f);
 }
