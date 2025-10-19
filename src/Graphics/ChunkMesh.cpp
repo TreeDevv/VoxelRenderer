@@ -45,7 +45,7 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     _vao.Unbind();
 }
 
-void GameGraphics::ChunkMesh::constructMesh()
+void GameGraphics::ChunkMesh::constructMesh(std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
 {
     for (int x = 0; x < _chunk->WIDTH; x++)
     {
@@ -61,45 +61,45 @@ void GameGraphics::ChunkMesh::constructMesh()
                     z == 0 ||
                     z >= _chunk->LENGTH - 1) // Edge of chunk condition. For now emit all to test
                 {
-                    if (_chunk->isSolid(glm::vec3(x, y, z)))
-                    {
-                        _addFace(glm::vec3(x, y, z), Face::PX);
-                        _addFace(glm::vec3(x, y, z), Face::NX);
-                        _addFace(glm::vec3(x, y, z), Face::PY);
-                        _addFace(glm::vec3(x, y, z), Face::NY);
-                        _addFace(glm::vec3(x, y, z), Face::PZ);
-                        _addFace(glm::vec3(x, y, z), Face::NZ);
-                        continue;
-                    }
+                    // if (_chunk->isSolid(glm::vec3(x, y, z)))
+                    // {
+                    //     _addFace(glm::vec3(x, y, z), Face::PX);
+                    //     _addFace(glm::vec3(x, y, z), Face::NX);
+                    //     _addFace(glm::vec3(x, y, z), Face::PY);
+                    //     _addFace(glm::vec3(x, y, z), Face::NY);
+                    //     _addFace(glm::vec3(x, y, z), Face::PZ);
+                    //     _addFace(glm::vec3(x, y, z), Face::NZ);
+                    //     continue;
+                    // }
                 }
 
                 // TODO Index block id for now just check air 0
                 // Check all sides for blocks
-                if (_chunk->get(x, y, z) == 0)
+                if (!renderDataIsOpaque(glm::vec3(x, y, z), renderData))
                     continue;
-                if (_chunk->get(x + 1, y, z) == 0) // Right face
+                if (!renderDataIsOpaque(glm::vec3(x + 1, y, z), renderData)) // Right face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::PX);
+                    _addFace(glm::vec3(x, y, z), Face::PX, renderData);
                 }
-                if (_chunk->get(x - 1, y, z) == 0) // Left face
+                if (!renderDataIsOpaque(glm::vec3(x - 1, y, z), renderData)) // Left face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::NX);
+                    _addFace(glm::vec3(x, y, z), Face::NX, renderData);
                 }
-                if (_chunk->get(x, y + 1, z) == 0) // Top face
+                if (!renderDataIsOpaque(glm::vec3(x, y + 1, z), renderData)) // Top face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::PY);
+                    _addFace(glm::vec3(x, y, z), Face::PY, renderData);
                 }
-                if (_chunk->get(x, y - 1, z) == 0) // Bottom face
+                if (!renderDataIsOpaque(glm::vec3(x, y - 1, z), renderData)) // Bottom face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::NY);
+                    _addFace(glm::vec3(x, y, z), Face::NY, renderData);
                 }
-                if (_chunk->get(x, y, z + 1) == 0) // Front face
+                if (!renderDataIsOpaque(glm::vec3(x, y, z + 1), renderData)) // Front face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::PZ);
+                    _addFace(glm::vec3(x, y, z), Face::PZ, renderData);
                 }
-                if (_chunk->get(x, y, z - 1) == 0) // Front face
+                if (!renderDataIsOpaque(glm::vec3(x, y, z - 1), renderData)) // Front face
                 {
-                    _addFace(glm::vec3(x, y, z), Face::NZ);
+                    _addFace(glm::vec3(x, y, z), Face::NZ, renderData);
                 }
             }
         }
@@ -117,21 +117,21 @@ void GameGraphics::ChunkMesh::constructMesh()
     }
 }
 
-void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face)
+void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
 {
     // Each face is 4 vertices //TODO CALCULATE AO HERE
     Vertex v1, v2, v3, v4;
     v1.pos = position + kFaces[(int)face][0];
-    v1.ao = _calculateAoValue(position, face, 0);
+    v1.ao = _calculateAoValue(position, face, 0, renderData);
 
     v2.pos = position + kFaces[(int)face][1];
-    v2.ao = _calculateAoValue(position, face, 1);
+    v2.ao = _calculateAoValue(position, face, 1, renderData);
 
     v3.pos = position + kFaces[(int)face][2];
-    v3.ao = _calculateAoValue(position, face, 2);
+    v3.ao = _calculateAoValue(position, face, 2, renderData);
 
     v4.pos = position + kFaces[(int)face][3];
-    v4.ao = _calculateAoValue(position, face, 3);
+    v4.ao = _calculateAoValue(position, face, 3, renderData);
 
     m_Vertices.push_back(v1);
     m_Vertices.push_back(v2);
@@ -139,14 +139,81 @@ void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face)
     m_Vertices.push_back(v4);
 }
 
-int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int vert)
+int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int vert, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
 {
-    bool s1 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][0]);
-    bool s2 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][1]);
-    bool s3 = _chunk->isSolid(pos + kVertexNeighbors[(int)face][vert][2]);
+    bool s1 = renderDataIsOpaque(pos + kVertexNeighbors[(int)face][vert][0], renderData);
+    bool s2 = renderDataIsOpaque(pos + kVertexNeighbors[(int)face][vert][1], renderData);
+    bool s3 = renderDataIsOpaque(pos + kVertexNeighbors[(int)face][vert][2], renderData);
 
     if (s1 && s2)
         return 3;
     else
         return (int)s1 + (int)s2 + (int)s3;
+}
+
+bool GameGraphics::ChunkMesh::renderDataIsOpaque(glm::vec3 localPos, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
+{
+
+    // Add to offset
+    // Corner conditions
+    if (localPos.y > Chunk::HEIGHT || localPos.y < 0)
+        return false; // No vertical chunking so y case visible is false
+    if (localPos.x < 0 && localPos.z < 0)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y - 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(Chunk::WIDTH, localPos.y, Chunk::LENGTH);
+    }
+    else if (localPos.x < 0 && localPos.z > Chunk::LENGTH)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y + 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(Chunk::Chunk::WIDTH, localPos.y, 0);
+    }
+    else if (localPos.x > Chunk::Chunk::WIDTH && localPos.z < 0)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y - 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(0, localPos.y, Chunk::LENGTH);
+    }
+    else if (localPos.x > Chunk::Chunk::WIDTH && localPos.z > Chunk::LENGTH)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y - 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(0, localPos.y, 0);
+    }
+    // One chunk over conditions
+    if (localPos.x < 0)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(Chunk::Chunk::WIDTH, localPos.y, localPos.z);
+    }
+    else if (localPos.x > Chunk::Chunk::WIDTH)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(0, localPos.y, localPos.z);
+    }
+    else if (localPos.z < 0)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x, _chunk->getPos().y - 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(localPos.x, localPos.y, Chunk::LENGTH);
+    }
+    else if (localPos.z > Chunk::LENGTH)
+    {
+        glm::vec2 index = glm::vec2(_chunk->getPos().x, _chunk->getPos().y + 1);
+        if ((*renderData).find(index) == (*renderData).end())
+            return false;
+        return (*renderData)[index]->get(localPos.x, localPos.y, 0);
+    }
+    return false;
 }
