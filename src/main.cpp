@@ -11,12 +11,14 @@ int main(int argc, char **argv)
 {
     Application app;
     std::cout << "Application Running" << std::endl;
-    try {
+    try
+    {
         app.run(argc, argv);
-    } catch(std::exception e)
+    }
+    catch (std::exception e)
     {
         std::cout << e.what();
     }
-    
+
     return 1;
 }
