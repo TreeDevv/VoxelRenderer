@@ -11,7 +11,12 @@ find_package(glm CONFIG REQUIRED)                 # target: glm::glm
 find_package(imgui CONFIG REQUIRED)               # target: imgui::imgui
 find_package(spdlog CONFIG REQUIRED)              # target: spdlog::spdlog_header_only
 
+add_library(NoiseHeader INTERFACE)
+target_include_directories(NoiseHeader INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external/noise")
+
 # App
+include_directories('external/noise/noise.hpp')
+
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.cpp)
 add_executable(${PROJECT_NAME} ${SRC})
 
@@ -22,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
     imgui::imgui
     glm::glm
     spdlog::spdlog_header_only
+    NoiseHeader
 )
 
 # Copy runtime assets (shaders, textures) next to the binary
