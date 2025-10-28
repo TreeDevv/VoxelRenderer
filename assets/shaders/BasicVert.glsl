@@ -13,6 +13,6 @@ out vec3 randomColor;
 void main()
 {
     gl_Position = u_Projection * u_View * u_Model * vec4(aPos, 1.0);
-    randomColor = vec3(0.4, 0.1, 0.2);
+    randomColor = vec3(0.3, 0.7, 0.3);
     vAO = aAO;
 }

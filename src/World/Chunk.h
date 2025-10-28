@@ -99,7 +99,7 @@ namespace GameWorld
         }
 
         // Get the mesh for this chunk, generating it if dirty
-        std::shared_ptr<GameGraphics::ChunkMesh> getMesh(std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderDistance);
+        std::shared_ptr<GameGraphics::ChunkMesh> getMesh(std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderDistance);
 
     private:
         glm::vec2 _pos;

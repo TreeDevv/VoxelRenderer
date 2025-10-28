@@ -45,7 +45,7 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     _vao.Unbind();
 }
 
-void GameGraphics::ChunkMesh::constructMesh(std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
+void GameGraphics::ChunkMesh::constructMesh(std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData)
 {
     for (int x = 0; x < _chunk->WIDTH; x++)
     {
@@ -113,11 +113,11 @@ void GameGraphics::ChunkMesh::constructMesh(std::shared_ptr<std::unordered_map<g
     }
     else
     {
-        std::cout << "No vertices";
+        //std::cout << "No vertices";
     }
 }
 
-void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
+void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData)
 {
     // Each face is 4 vertices //TODO CALCULATE AO HERE
     Vertex v1, v2, v3, v4;
@@ -139,7 +139,7 @@ void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::share
     m_Vertices.push_back(v4);
 }
 
-int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int vert, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
+int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int vert, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData)
 {
     bool s1 = renderDataIsOpaque(pos + kVertexNeighbors[(int)face][vert][0], renderData);
     bool s2 = renderDataIsOpaque(pos + kVertexNeighbors[(int)face][vert][1], renderData);
@@ -151,69 +151,73 @@ int GameGraphics::ChunkMesh::_calculateAoValue(glm::vec3 pos, Face face, int ver
         return (int)s1 + (int)s2 + (int)s3;
 }
 
-bool GameGraphics::ChunkMesh::renderDataIsOpaque(glm::vec3 localPos, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData)
+bool GameGraphics::ChunkMesh::renderDataIsOpaque(glm::vec3 localPos, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData)
 {
 
     // Add to offset
     // Corner conditions
-    if (localPos.y > Chunk::HEIGHT || localPos.y < 0)
+    if (localPos.x < Chunk::WIDTH && localPos.x >= 0 && localPos.y >= 0 && localPos.y < Chunk::HEIGHT && localPos.z >= 0 && localPos.z < Chunk::LENGTH) {
+        return this->_chunk->get(localPos) != 0;
+    }
+
+    if (localPos.y >= Chunk::HEIGHT || localPos.y < 0)
         return false; // No vertical chunking so y case visible is false
     if (localPos.x < 0 && localPos.z < 0)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y - 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(Chunk::WIDTH, localPos.y, Chunk::LENGTH);
+        return renderData[index]->get(Chunk::WIDTH, localPos.y, Chunk::LENGTH) != 0;
     }
-    else if (localPos.x < 0 && localPos.z > Chunk::LENGTH)
+    else if (localPos.x < 0 && localPos.z >= Chunk::LENGTH)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y + 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(Chunk::Chunk::WIDTH, localPos.y, 0);
+        return renderData[index]->get(Chunk::Chunk::WIDTH, localPos.y, 0) != 0;
     }
-    else if (localPos.x > Chunk::Chunk::WIDTH && localPos.z < 0)
+    else if (localPos.x >= Chunk::Chunk::WIDTH && localPos.z < 0)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y - 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(0, localPos.y, Chunk::LENGTH);
+        return renderData[index]->get(0, localPos.y, Chunk::LENGTH) != 0;
     }
-    else if (localPos.x > Chunk::Chunk::WIDTH && localPos.z > Chunk::LENGTH)
+    else if (localPos.x >= Chunk::Chunk::WIDTH && localPos.z >= Chunk::LENGTH)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y - 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(0, localPos.y, 0);
+        return renderData[index]->get(0, localPos.y, 0) != 0;
     }
     // One chunk over conditions
     if (localPos.x < 0)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x - 1, _chunk->getPos().y);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(Chunk::Chunk::WIDTH, localPos.y, localPos.z);
+        return renderData[index]->get(Chunk::Chunk::WIDTH, localPos.y, localPos.z) != 0;
     }
-    else if (localPos.x > Chunk::Chunk::WIDTH)
+    else if (localPos.x >= Chunk::Chunk::WIDTH)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x + 1, _chunk->getPos().y);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(0, localPos.y, localPos.z);
+        return renderData[index]->get(0, localPos.y, localPos.z) != 0;
     }
     else if (localPos.z < 0)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x, _chunk->getPos().y - 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(localPos.x, localPos.y, Chunk::LENGTH);
+        return renderData[index]->get(localPos.x, localPos.y, Chunk::LENGTH) != 0;
     }
-    else if (localPos.z > Chunk::LENGTH)
+    else if (localPos.z >= Chunk::LENGTH)
     {
         glm::vec2 index = glm::vec2(_chunk->getPos().x, _chunk->getPos().y + 1);
-        if ((*renderData).find(index) == (*renderData).end())
+        if (renderData.find(index) == renderData.end())
             return false;
-        return (*renderData)[index]->get(localPos.x, localPos.y, 0);
+        return renderData[index]->get(localPos.x, localPos.y, 0) != 0;
     }
     return false;
 }

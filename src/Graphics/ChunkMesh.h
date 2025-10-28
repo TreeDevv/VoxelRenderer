@@ -132,7 +132,7 @@ namespace GameGraphics
     public:
         ChunkMesh(std::shared_ptr<Chunk> chunk);
 
-        void constructMesh(std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData);
+        void constructMesh(std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData);
 
         VertexArray getVAO() const { return _vao; }
         unsigned int getVerticeCount() const { return _verticesCount; }
@@ -146,9 +146,9 @@ namespace GameGraphics
         std::vector<Vertex> m_Vertices;
         unsigned int _verticesCount;
 
-        void _addFace(glm::vec3 position, Face face, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData);
-        int _calculateAoValue(glm::vec3 pos, Face face, int vert, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData);
+        void _addFace(glm::vec3 position, Face face, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData);
+        int _calculateAoValue(glm::vec3 pos, Face face, int vert, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData);
 
-        bool renderDataIsOpaque(glm::vec3 localPos, std::shared_ptr<std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>> renderData);
+        bool renderDataIsOpaque(glm::vec3 localPos, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData);
     };
 }

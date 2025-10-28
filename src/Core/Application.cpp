@@ -16,6 +16,7 @@
 #include "../GL/ShaderProgram.h"
 
 #include "../World/Chunk.h"
+#include "../World/Universe.h"
 
 using namespace GameCore;
 using namespace GamePlatform;
@@ -48,7 +49,9 @@ namespace GameCore
     {
         std::shared_ptr<Camera> camera = services->get<Camera>();
         std::shared_ptr<Input> input = services->get<Input>();
+        std::shared_ptr<Universe> universe = services->get<Universe>();
         // Timers, Events, Input polling
+        universe->update(camera->Position);
 
         // Camera movement
         if (Input::isKeyDown(Key::W))
@@ -119,31 +122,11 @@ namespace GameCore
         // Test cube renderer
         std::shared_ptr<CubeRenderer> _testRenderer = std::make_shared<CubeRenderer>();
         services->set<CubeRenderer>(_testRenderer);
-
-        // Create a chunk to test meshing
-        std::vector<std::shared_ptr<Chunk>> chunks = std::vector<std::shared_ptr<Chunk>>();
-        for (int i = 0; i < 16; i++)
-        {
-            for (int j = 0; j < 16; j++)
-            {
-                std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(glm::vec2(i, j));
-                chunks.push_back(chunk);
-                for (int x = 0; x < 16; x++)
-                {
-                    for (int y = 0; y < 128; y++)
-                    {
-                        for (int z = 0; z < 16; z++)
-                        {
-
-                            if (x > y * 2)
-                            {
-                                chunk->set(x, y, z, GameWorld::BlockID::DIRT);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        
+        // Universe / Game World
+        std::shared_ptr<Universe> universe = std::make_shared<Universe>(glm::vec3(0));
+        universe->update(glm::vec3(0));
+        services->set<Universe>(universe);
 
         ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
 
@@ -159,28 +142,19 @@ namespace GameCore
             // Clear both color and depth each frame to avoid stale depth values
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Render test cube at origin so it's inside clip space for the simple shader
-            // for (float x = 0; x < 100; x += 1.1)
-            // {
-            //     for (float y = 0; y < 100; y += 1.1)
-            //     {
-            //         _testRenderer->renderCube(camera, glm::vec3(20, 0, 0) + glm::vec3(x, ((x / 10) + (y / 10)), y));
-            //     }
-            // }
-            // _testRenderer->renderCube(camera, glm::vec3(0.0f));
-
             shader.use();
             shader.setMat4("u_View", camera->GetViewMatrix());
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
 
-            for (auto chunk : chunks)
+            for (auto &[pos, chunk] : universe->getRenderList())
             {
-                auto chunkPos = chunk->getPos();
-                shader.setMat4("u_Model", glm::translate(glm::mat4(1.0f), glm::vec3(chunkPos.x, 1, chunkPos.y)));
+                shader.setMat4("u_Model", glm::translate(glm::mat4(1.0f), glm::vec3(pos.x * 16, 1, pos.y * 16)));
 
-                chunk->getMesh()->getVAO().Bind();
-                (glDrawElements(GL_TRIANGLES, floor(chunk->getMesh()->getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
-                chunk->getMesh()->getVAO().Unbind();
+                std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>& renderData = universe->getRenderList();
+
+                chunk->getMesh(renderData)->getVAO().Bind();
+                (glDrawElements(GL_TRIANGLES, floor(chunk->getMesh(renderData)->getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));
+                chunk->getMesh(renderData)->getVAO().Unbind();
             }
 
             window->swapBuffers();
