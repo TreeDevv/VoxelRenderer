@@ -83,6 +83,8 @@ namespace GameGraphics
         } // NZ
     };
 
+    
+
     static const glm::vec3 kVertexNeighbors[6][4][3] = {
         // --- PX (+X face) ---
         {

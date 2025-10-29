@@ -12,7 +12,8 @@ find_package(imgui CONFIG REQUIRED)               # target: imgui::imgui
 find_package(spdlog CONFIG REQUIRED)              # target: spdlog::spdlog_header_only
 
 add_library(NoiseHeader INTERFACE)
-target_include_directories(NoiseHeader INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external/noise")
+target_include_directories(
+  NoiseHeader INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external/noise")
 
 # App
 include_directories('external/noise/noise.hpp')

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <memory>
 #include <glm/glm.hpp>
-#include "Block/Block.h"
+#include "Block.hpp"
 
 // Forward declaration to avoid circular includes
 namespace GameGraphics
