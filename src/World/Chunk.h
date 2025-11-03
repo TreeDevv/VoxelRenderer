@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <memory>
 #include <glm/glm.hpp>
+#include <mutex>
+#include <thread>
 #include "Block.hpp"
 
 // Forward declaration to avoid circular includes
@@ -39,12 +41,13 @@ namespace GameWorld
             _voxels.resize(WIDTH * HEIGHT * LENGTH, BlockID::AIR);
         }
 
-        std::vector<BlockID> get() const
+        std::vector<BlockID> get()
         {
+            std::scoped_lock lk(_accessMutex);
             return _voxels;
         }
 
-        BlockID get(glm::vec3 pos) const
+        BlockID get(glm::vec3 pos)
         {
             // Corner conditions
             // if (pos.x < 0 && pos.z < 0) {
@@ -66,27 +69,36 @@ namespace GameWorld
             // } else if(pos.z > LENGTH) {
             //     return GameChunks[glm::vec2(_pos.x, _pos.y + 1)]->get(pos.x, pos.y, 0);
             // }
-
             return get(pos.x, pos.y, pos.z);
         }
 
-        BlockID get(int x, int y, int z) const
+        BlockID get(int x, int y, int z)
         {
+            std::scoped_lock lk(_accessMutex);
             return _voxels[index(x, y, z)];
         }
 
-        bool isSolid(glm::vec3 pos) const
+        bool isSolid(glm::vec3 pos)
         {
             return (get(pos) == BlockID::AIR);
         }
 
-        glm::vec2 getPos() const
+        glm::vec2 getPos()
         {
+            std::scoped_lock lk(_accessMutex);
             return _pos * glm::vec2(WIDTH, LENGTH);
+        }
+
+        void set(std::vector<BlockID> &voxels)
+        {
+            std::scoped_lock lk(_accessMutex);
+            _voxels = voxels;
+            _dirty = true;
         }
 
         void set(int x, int y, int z, BlockID id)
         {
+            std::scoped_lock lk(_accessMutex);
             _voxels[index(x, y, z)] = id;
             _dirty = true;
         }
@@ -102,6 +114,8 @@ namespace GameWorld
         std::shared_ptr<GameGraphics::ChunkMesh> getMesh(std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderDistance);
 
     private:
+        std::mutex _accessMutex;
+
         glm::vec2 _pos;
 
         std::vector<BlockID> _voxels;

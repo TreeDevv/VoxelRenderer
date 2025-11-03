@@ -8,7 +8,6 @@ using namespace GameWorld;
 
 GameWorld::Universe::Universe(glm::vec3 playerPos) : _playerPos(playerPos)
 {
-    
 }
 
 void GameWorld::Universe::update(glm::vec3 playerPos)
@@ -21,31 +20,37 @@ void GameWorld::Universe::update(glm::vec3 playerPos)
 
     // Get rid of chunks not in range
     // TODO: Cache chunk data
-    for (auto it = _chunks.begin(); it != _chunks.end();) {
+    for (auto it = _chunks.begin(); it != _chunks.end();)
+    {
         auto &[pos, chunk] = *it;
-         if (pos.x < minOffset.x || pos.x > maxOffset.x || pos.y < minOffset.y || pos.y > maxOffset.y) {
+        if (pos.x < minOffset.x || pos.x > maxOffset.x || pos.y < minOffset.y || pos.y > maxOffset.y)
+        {
             this->_chunks.erase(it++);
-        } else {
+        }
+        else
+        {
             it++;
         }
     }
 
-    for (int x = minOffset.x; x < maxOffset.x; x++) {
-        for (int y = minOffset.y; y < maxOffset.y; y++) {
+    for (int x = minOffset.x; x < maxOffset.x; x++)
+    {
+        for (int y = minOffset.y; y < maxOffset.y; y++)
+        {
             glm::vec2 pos(x, y);
 
-            if (!this->_chunks.contains(pos)) {
+            if (!this->_chunks.contains(pos))
+            {
                 // Generate chunk
                 auto chunk = std::make_shared<Chunk>(pos);
-                ChunkGenerator::generate(chunk);
                 this->_chunks.emplace(pos, chunk);
+                chunkPool.submit(ChunkGenerator::generate, chunk);
             }
         }
     }
-
 }
 
-std::unordered_map<glm::vec2, std::shared_ptr<GameWorld::Chunk>>& GameWorld::Universe::getRenderList()
+std::unordered_map<glm::vec2, std::shared_ptr<GameWorld::Chunk>> &GameWorld::Universe::getRenderList()
 {
     return _chunks;
 }
