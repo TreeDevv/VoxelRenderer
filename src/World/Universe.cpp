@@ -44,7 +44,7 @@ void GameWorld::Universe::update(glm::vec3 playerPos)
                 // Generate chunk
                 auto chunk = std::make_shared<Chunk>(pos);
                 this->_chunks.emplace(pos, chunk);
-                chunkPool.submit(ChunkGenerator::generate, chunk);
+                ChunkGenerator::generate(chunk);
             }
         }
     }

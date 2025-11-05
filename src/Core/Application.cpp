@@ -43,6 +43,7 @@ namespace GameCore
 
     void Application::shutdown()
     {
+        glfwTerminate();
     }
 
     void Application::update(std::shared_ptr<Services> services)
@@ -122,13 +123,18 @@ namespace GameCore
         // Test cube renderer
         std::shared_ptr<CubeRenderer> _testRenderer = std::make_shared<CubeRenderer>();
         services->set<CubeRenderer>(_testRenderer);
-        
+
         // Universe / Game World
         std::shared_ptr<Universe> universe = std::make_shared<Universe>(glm::vec3(0));
         universe->update(glm::vec3(0));
         services->set<Universe>(universe);
 
         ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
+
+        glm::vec3 lightPos(-10.f, 30.f, -10.f);
+        glm::vec3 lightColor(1.f, 1.f, 1.f);
+        shader.setVec3("u_LightPos", lightPos);
+        shader.setVec3("u_LightColor", lightColor);
 
         while (_running && !window->shouldClose())
         {
@@ -145,12 +151,13 @@ namespace GameCore
             shader.use();
             shader.setMat4("u_View", camera->GetViewMatrix());
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
+            shader.setVec3("u_ViewPos", camera->Position);
 
             for (auto &[pos, chunk] : universe->getRenderList())
             {
                 shader.setMat4("u_Model", glm::translate(glm::mat4(1.0f), glm::vec3(pos.x * 16, 1, pos.y * 16)));
 
-                std::unordered_map<glm::vec2, std::shared_ptr<Chunk>>& renderData = universe->getRenderList();
+                std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData = universe->getRenderList();
 
                 chunk->getMesh(renderData)->getVAO().Bind();
                 (glDrawElements(GL_TRIANGLES, floor(chunk->getMesh(renderData)->getVerticeCount() / 4) * 6, GL_UNSIGNED_INT, 0));

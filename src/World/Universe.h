@@ -10,7 +10,7 @@
 
 namespace GameWorld
 {
-    const int RENDER_DISTANCE = 16;
+    const int RENDER_DISTANCE = 8;
 
     inline static bool inRenderDistance(glm::vec2 originPos, glm::vec2 chunkPos)
     {

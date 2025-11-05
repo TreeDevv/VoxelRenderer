@@ -23,6 +23,7 @@ namespace GameGraphics
     {
         glm::vec3 pos; // Location 0
         uint8_t ao;
+        glm::vec3 normal;
     };
 
     enum class Face : uint8_t
@@ -83,9 +84,7 @@ namespace GameGraphics
         } // NZ
     };
 
-    
-
-    static const glm::vec3 kVertexNeighbors[6][4][3] = {
+        static const glm::vec3 kVertexNeighbors[6][4][3] = {
         // --- PX (+X face) ---
         {
             {{0, -1, 0}, {0, 0, -1}, {0, -1, -1}}, // v0 (1,1,1)

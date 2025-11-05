@@ -1,6 +1,5 @@
 #include "ShaderProgram.h"
 
-
 using namespace std;
 
 ShaderProgram::ShaderProgram(const char *vertPath, const char *fragPath)
@@ -15,7 +14,7 @@ ShaderProgram::ShaderProgram(const char *vertPath, const char *fragPath)
 
     // vertex Shader
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char* cVertCode = vertCode.c_str();
+    const char *cVertCode = vertCode.c_str();
     glShaderSource(vertexShader, 1, &cVertCode, NULL);
     glCompileShader(vertexShader);
     // print compile errors if any
@@ -29,7 +28,7 @@ ShaderProgram::ShaderProgram(const char *vertPath, const char *fragPath)
 
     // similiar for Fragment Shader
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* cFragCode = fragCode.c_str();
+    const char *cFragCode = fragCode.c_str();
     glShaderSource(fragmentShader, 1, &cFragCode, NULL);
     glCompileShader(fragmentShader);
     // Compile errors
@@ -37,7 +36,8 @@ ShaderProgram::ShaderProgram(const char *vertPath, const char *fragPath)
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
+        cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+             << infoLog << endl;
     }
 
     // shader Program
@@ -68,19 +68,26 @@ void ShaderProgram::use()
     glUseProgram(_program);
 }
 
-void ShaderProgram::setVec3(const char* name, float x, float y, float z)
+void ShaderProgram::setVec3(const char *name, float x, float y, float z)
 {
     GLint loc = glGetUniformLocation(_program, name);
-    if (loc == -1) return;
+    if (loc == -1)
+        return;
     glUseProgram(_program);
     glUniform3f(loc, x, y, z);
+}
+
+void ShaderProgram::setVec3(const char *name, const glm::vec3 &pos)
+{
+    setVec3(name, pos.x, pos.y, pos.z);
 }
 
 void ShaderProgram::setMat4(const char *name, const glm::mat4 &mat)
 {
     use();
     GLint loc = glGetUniformLocation(_program, name);
-    if (loc == -1) return;
+    if (loc == -1)
+        return;
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 

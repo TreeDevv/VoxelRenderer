@@ -43,7 +43,6 @@ namespace GameWorld
 
         std::vector<BlockID> get()
         {
-            std::scoped_lock lk(_accessMutex);
             return _voxels;
         }
 
@@ -74,7 +73,6 @@ namespace GameWorld
 
         BlockID get(int x, int y, int z)
         {
-            std::scoped_lock lk(_accessMutex);
             return _voxels[index(x, y, z)];
         }
 
@@ -85,20 +83,17 @@ namespace GameWorld
 
         glm::vec2 getPos()
         {
-            std::scoped_lock lk(_accessMutex);
             return _pos * glm::vec2(WIDTH, LENGTH);
         }
 
         void set(std::vector<BlockID> &voxels)
         {
-            std::scoped_lock lk(_accessMutex);
             _voxels = voxels;
             _dirty = true;
         }
 
         void set(int x, int y, int z, BlockID id)
         {
-            std::scoped_lock lk(_accessMutex);
             _voxels[index(x, y, z)] = id;
             _dirty = true;
         }
@@ -114,8 +109,6 @@ namespace GameWorld
         std::shared_ptr<GameGraphics::ChunkMesh> getMesh(std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderDistance);
 
     private:
-        std::mutex _accessMutex;
-
         glm::vec2 _pos;
 
         std::vector<BlockID> _voxels;

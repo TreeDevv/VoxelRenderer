@@ -6,7 +6,7 @@
 
 void GameWorld::ChunkGenerator::generate(std::shared_ptr<Chunk> chunk)
 {
-    std::cout << "Generating Chunk: " << chunk->getPos().x << " " << chunk->getPos().y << '\n';
+    // std::cout << "Generating Chunk: " << chunk->getPos().x << " " << chunk->getPos().y << '\n';
 
     const static int seed = 4;
     const static siv::PerlinNoise perlin(seed);
