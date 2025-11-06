@@ -15,11 +15,14 @@ add_library(NoiseHeader INTERFACE)
 target_include_directories(
   NoiseHeader INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external/noise")
 
+
+
 # App
 include_directories('external/noise/noise.hpp')
 
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS src/*.cpp)
 add_executable(${PROJECT_NAME} ${SRC})
+
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
