@@ -158,7 +158,7 @@ namespace GameCore
             update(services);
 
             // Renderer calls.
-            glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+            glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
             // Clear both color and depth each frame to avoid stale depth values
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
