@@ -139,7 +139,7 @@ namespace GameCore
         shader.setVec2("u_TextureAtlasSize", atlasDimensions);
 
         glm::vec3 lightPos(-10.f, 30.f, -10.f);
-        glm::vec3 lightColor(1.f, 1.f, 1.f);
+        glm::vec3 lightColor(1.f, 0.5f, 0.1f);
         shader.setVec3("u_LightPos", lightPos);
         shader.setVec3("u_LightColor", lightColor);
 

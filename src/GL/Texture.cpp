@@ -7,7 +7,7 @@
 
 Texture::Texture(const char *path)
 {
-    stbi_set_flip_vertically_on_load(true); // GL tex coords start at bottom left. We want to use a top left apporach
+    // stbi_set_flip_vertically_on_load(true); // GL tex coords start at bottom left. We want to use a top left apporach
 
     glGenTextures(1, &_handle);
     glBindTexture(GL_TEXTURE_2D, _handle);
@@ -16,7 +16,7 @@ Texture::Texture(const char *path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     int width, height, nrChannels;
     unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);

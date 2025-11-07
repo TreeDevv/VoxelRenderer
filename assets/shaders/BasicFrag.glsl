@@ -44,5 +44,5 @@ void main()
     float aoFactor = 1.0;
 
     vec3 result = (ambient + diffuse + specular) * color;
-    FragColor = colorVec4; // colorVec4; //vec4(result * aoFactor, 1.0f);
+    FragColor = vec4(result * aoFactor, 1.0); // colorVec4; //vec4(result * aoFactor, 1.0f);
 }

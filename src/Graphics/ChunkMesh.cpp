@@ -141,17 +141,17 @@ void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::unord
     v2.pos = position + kFaces[(int)face][1];
     v2.ao = _calculateAoValue(position, face, 1, renderData);
     v2.normal = kFaceNormalI[(int)face];
-    v2.texPos = glm::vec2(textureOffsetPixels.x + 16, textureOffsetPixels.y);
+    v2.texPos = glm::vec2(textureOffsetPixels.x, textureOffsetPixels.y + 15);
 
     v3.pos = position + kFaces[(int)face][2];
     v3.ao = _calculateAoValue(position, face, 2, renderData);
     v3.normal = kFaceNormalI[(int)face];
-    v3.texPos = glm::vec2(textureOffsetPixels.x + 16, textureOffsetPixels.y + 16);
+    v3.texPos = glm::vec2(textureOffsetPixels.x + 15, textureOffsetPixels.y + 15);
 
     v4.pos = position + kFaces[(int)face][3];
     v4.ao = _calculateAoValue(position, face, 3, renderData);
     v4.normal = kFaceNormalI[(int)face];
-    v4.texPos = glm::vec2(textureOffsetPixels.x, textureOffsetPixels.y + 16);
+    v4.texPos = glm::vec2(textureOffsetPixels.x + 15, textureOffsetPixels.y);
     // Convert pixel position to normalized versions in frag shader
 
     // std::cout << "UVs: "
