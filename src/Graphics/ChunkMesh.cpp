@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+using namespace Util;
+
 GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     : _chunk(chunk) // initialize member variable(s) here
 {
@@ -40,9 +42,12 @@ GameGraphics::ChunkMesh::ChunkMesh(std::shared_ptr<Chunk> chunk)
     _vao.Bind();
     _vbo.Bind();
     StaticIBO.Bind();
+
     _vbo.VertexAttribute(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, pos));
-    _vbo.VertexAttribute(1, 1, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, ao));
+    _vbo.VertexAttribute(1, 1, GL_INT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, ao));
     _vbo.VertexAttribute(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+    _vbo.VertexAttribute(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, texPos));
+
     _vao.Unbind();
 }
 
@@ -120,23 +125,40 @@ void GameGraphics::ChunkMesh::constructMesh(std::unordered_map<glm::vec2, std::s
 
 void GameGraphics::ChunkMesh::_addFace(glm::vec3 position, Face face, std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> &renderData)
 {
+    BlockID currentBlock = this->_chunk->get(position);
+    auto &blockInfo = BlockIndex.at(currentBlock);
+
+    glm::ivec2 textureOffset = blockInfo->textureOffset(face);
+    glm::ivec2 textureOffsetPixels = textureOffset * glm::ivec2(16, 16);
+
     // Each face is 4 vertices //TODO CALCULATE AO HERE
     Vertex v1, v2, v3, v4;
     v1.pos = position + kFaces[(int)face][0];
     v1.ao = _calculateAoValue(position, face, 0, renderData);
     v1.normal = kFaceNormalI[(int)face];
+    v1.texPos = glm::vec2(textureOffsetPixels.x, textureOffsetPixels.y);
 
     v2.pos = position + kFaces[(int)face][1];
     v2.ao = _calculateAoValue(position, face, 1, renderData);
     v2.normal = kFaceNormalI[(int)face];
+    v2.texPos = glm::vec2(textureOffsetPixels.x + 16, textureOffsetPixels.y);
 
     v3.pos = position + kFaces[(int)face][2];
     v3.ao = _calculateAoValue(position, face, 2, renderData);
     v3.normal = kFaceNormalI[(int)face];
+    v3.texPos = glm::vec2(textureOffsetPixels.x + 16, textureOffsetPixels.y + 16);
 
     v4.pos = position + kFaces[(int)face][3];
     v4.ao = _calculateAoValue(position, face, 3, renderData);
     v4.normal = kFaceNormalI[(int)face];
+    v4.texPos = glm::vec2(textureOffsetPixels.x, textureOffsetPixels.y + 16);
+    // Convert pixel position to normalized versions in frag shader
+
+    // std::cout << "UVs: "
+    //           << v1.texPos.x << "," << v1.texPos.y << "  |  "
+    //           << v2.texPos.x << "," << v2.texPos.y << "  |  "
+    //           << v3.texPos.x << "," << v3.texPos.y << "  |  "
+    //           << v4.texPos.x << "," << v4.texPos.y << "\n";
 
     m_Vertices.push_back(v1);
     m_Vertices.push_back(v2);

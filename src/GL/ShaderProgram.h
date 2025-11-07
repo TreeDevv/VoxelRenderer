@@ -19,8 +19,17 @@ public:
 
     void use();
 
+    void setInt(const char *name, int x);
+
+    void setVec2i(const char *name, int x, int y);
+    void setVec2i(const char *name, glm::ivec2 &pos);
+
+    void setVec2(const char *name, float x, float y);
+    void setVec2(const char *name, glm::vec2 &pos);
+
     void setVec3(const char *name, float x, float y, float z);
     void setVec3(const char *name, const glm::vec3 &pos);
+
     void setMat4(const char *name, const glm::mat4 &mat);
 
 private:

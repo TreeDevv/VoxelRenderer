@@ -14,6 +14,7 @@
 #include "../Graphics/Camera.hpp"
 #include "../Graphics/ChunkMesh.h"
 #include "../GL/ShaderProgram.h"
+#include "../GL/Texture.h"
 
 #include "../World/Chunk.h"
 #include "../World/Universe.h"
@@ -91,7 +92,7 @@ namespace GameCore
         }
         services->set<IWindow>(window);
 
-        std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+        std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3(0, 20, 0));
         services->set<Camera>(camera);
 
         std::shared_ptr<Input> input = std::make_shared<Input>(window->nativeHandle());
@@ -131,6 +132,12 @@ namespace GameCore
 
         ShaderProgram shader("assets/shaders/BasicVert.glsl", "assets/shaders/BasicFrag.glsl");
 
+        Texture texture("assets/BlockAtlas.png");
+        glm::vec2 atlasDimensions = texture.getDimensions();
+
+        shader.setInt("u_TextureAtlas", 0);
+        shader.setVec2("u_TextureAtlasSize", atlasDimensions);
+
         glm::vec3 lightPos(-10.f, 30.f, -10.f);
         glm::vec3 lightColor(1.f, 1.f, 1.f);
         shader.setVec3("u_LightPos", lightPos);
@@ -153,6 +160,7 @@ namespace GameCore
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
             shader.setVec3("u_ViewPos", camera->Position);
 
+            texture.bind();
             for (auto &[pos, chunk] : universe->getRenderList())
             {
                 shader.setMat4("u_Model", glm::translate(glm::mat4(1.0f), glm::vec3(pos.x * 16, 1, pos.y * 16)));

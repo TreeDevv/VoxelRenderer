@@ -9,10 +9,14 @@
 #include <glm/vec2.hpp>
 #include <glm/common.hpp>
 
+#include "../Util/util.hpp"
+using namespace Util;
+
 #include "../GL/IndexBuffer.hpp"
 #include "../GL/VertexArray.h"
 #include "../GL/VertexBuffer.h"
 
+#include "../World/Block.hpp"
 #include "../World/Chunk.h"
 
 using namespace GameWorld;
@@ -22,19 +26,10 @@ namespace GameGraphics
     struct Vertex
     {
         glm::vec3 pos; // Location 0
-        uint8_t ao;
+        int ao;
         glm::vec3 normal;
+        glm::vec2 texPos;
     };
-
-    enum class Face : uint8_t
-    {
-        PX = 0,
-        NX = 1,
-        PY = 2,
-        NY = 3,
-        PZ = 4,
-        NZ = 5,
-    }; // +X -X +Y -Y +Z -Z
 
     static const glm::ivec3 kFaceNormalI[6] = {
         {+1, 0, 0},
@@ -84,7 +79,7 @@ namespace GameGraphics
         } // NZ
     };
 
-        static const glm::vec3 kVertexNeighbors[6][4][3] = {
+    static const glm::vec3 kVertexNeighbors[6][4][3] = {
         // --- PX (+X face) ---
         {
             {{0, -1, 0}, {0, 0, -1}, {0, -1, -1}}, // v0 (1,1,1)

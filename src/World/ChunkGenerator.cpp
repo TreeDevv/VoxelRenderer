@@ -23,7 +23,7 @@ void GameWorld::ChunkGenerator::generate(std::shared_ptr<Chunk> chunk)
             noise = floor(noise * 30);
             for (int y = 0; y < noise; y++)
             {
-                chunkVoxels[x + Chunk::WIDTH * (z + Chunk::LENGTH * y)] = BlockID::DIRT;
+                chunkVoxels[x + Chunk::WIDTH * (z + Chunk::LENGTH * y)] = BlockID::GRASS;
             }
         }
     }

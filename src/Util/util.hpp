@@ -1,16 +1,19 @@
+#pragma once
+
 #include <iostream>
 
 namespace Util
 {
-    const static uint16_t TEXTURE_SIZE = 16;
+    constexpr uint16_t TEXTURE_SIZE = 16;
 
-    enum class Direction : uint8_t
+    enum class Face : uint8_t
     {
-        Right = 0,
-        Left = 1,
-        Top = 2,
-        Bottom = 3,
-        Front = 4,
-        Back = 5,
-    }; // +X -X +Y
+        PX = 0,
+        NX = 1,
+        PY = 2,
+        NY = 3,
+        PZ = 4,
+        NZ = 5,
+    }; // +X -X +Y -Y +Z -Z
+
 }

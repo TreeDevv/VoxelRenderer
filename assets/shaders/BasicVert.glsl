@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in float aAO;
 layout (location = 2) in vec3 aNormal;
+layout (location = 3) in vec2 aTexPos;
 
 uniform mat4 u_Model;
 uniform mat4 u_View;
@@ -12,6 +13,7 @@ out float vAO;
 out vec3 vNormal;
 out vec3 vFragPos;
 out vec3 randomColor;
+out vec2 vTexPos;
 
 void main()
 {
@@ -20,4 +22,5 @@ void main()
     vFragPos = vec3(u_Model * vec4(aPos, 1.0));
     vAO = aAO;
     vNormal = mat3(transpose(inverse(u_Model))) * aNormal;
+    vTexPos = aTexPos;
 }
