@@ -12,8 +12,8 @@ uniform mat4 u_Projection;
 out float vAO;
 out vec3 vNormal;
 out vec3 vFragPos;
-out vec3 randomColor;
 out vec2 vTexPos;
+out vec3 randomColor;
 
 void main()
 {

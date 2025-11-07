@@ -78,6 +78,16 @@ void ShaderProgram::setInt(const char *name, int x)
     glUniform1i(loc, x);
 }
 
+void ShaderProgram::setFloat(const char *name, float x)
+{
+    GLint loc = glGetUniformLocation(_program, name);
+    if (loc == -1)
+        return;
+
+    glUseProgram(_program);
+    glUniform1f(loc, x);
+}
+
 void ShaderProgram::setVec2i(const char *name, int x, int y)
 {
     GLint loc = glGetUniformLocation(_program, name);

@@ -135,9 +135,16 @@ namespace GameCore
         Texture texture("assets/BlockAtlas.png");
         glm::vec2 atlasDimensions = texture.getDimensions();
 
+        // Texture Atlasing
         shader.setInt("u_TextureAtlas", 0);
         shader.setVec2("u_TextureAtlasSize", atlasDimensions);
 
+        // Fog uniforms
+        shader.setFloat("u_FogMinDist", 100.0f);
+        shader.setFloat("u_FogMaxDist", 115.0f);
+        shader.setVec3("u_FogColor", glm::vec3(0.8f, 0.8f, 0.8f));
+
+        // Phong Lighting
         glm::vec3 lightPos(-10.f, 30.f, -10.f);
         glm::vec3 lightColor(1.f, 0.5f, 0.1f);
         shader.setVec3("u_LightPos", lightPos);
@@ -157,6 +164,7 @@ namespace GameCore
 
             shader.use();
             shader.setMat4("u_View", camera->GetViewMatrix());
+            shader.setVec3("u_CameraPos", camera->Position);
             shader.setMat4("u_Projection", camera->GetPerspectiveMatrix());
             shader.setVec3("u_ViewPos", camera->Position);
 

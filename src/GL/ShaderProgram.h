@@ -20,6 +20,7 @@ public:
     void use();
 
     void setInt(const char *name, int x);
+    void setFloat(const char *name, float x);
 
     void setVec2i(const char *name, int x, int y);
     void setVec2i(const char *name, glm::ivec2 &pos);

@@ -8,8 +8,14 @@ in vec3 randomColor;
 
 out vec4 FragColor;
 
+uniform vec3 u_CameraPos;
+
 uniform sampler2D u_TextureAtlas;
 uniform vec2 u_TextureAtlasSize;
+
+uniform float u_FogMinDist;
+uniform float u_FogMaxDist;
+uniform vec3 u_FogColor;
 
 uniform vec3 u_LightPos;
 uniform vec3 u_LightColor;
@@ -41,8 +47,14 @@ void main()
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * color;
 
+    float dist = length(u_CameraPos - vFragPos);
+    float fogFactor = (u_FogMaxDist - dist) / (u_FogMaxDist - u_FogMinDist);
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+
     float aoFactor = 1.0;
 
     vec3 result = (ambient + diffuse + specular) * color;
+    result = mix(u_FogColor, result, fogFactor);
+
     FragColor = vec4(result * aoFactor, 1.0); // colorVec4; //vec4(result * aoFactor, 1.0f);
 }
